@@ -1,0 +1,50 @@
+Build an Awwwards-level, scroll-driven WebGL landing page for "JCT Fit-Outs ERP", a construction fit-out ERP + CRM platform. Quality bar: GSAP + Three.js award-winning sites (cinematic, one continuous 3D story). This is NOT a template, NOT a card grid, NOT a fade-in-sections site. If anything must be cut for time, cut DOM extras, never the 3D scene or scroll choreography.
+
+CONCEPT: "Blueprint to built." One persistent full-screen 3D scene stays fixed behind the whole page. As the user scrolls, a fit-out floor plan draws itself as glowing blueprint lines, walls rise under a scanning light, the camera flies inside a room, the building explodes into layered ERP modules, then collapses into a glowing core. All text sections are DOM overlays on top of this scene.
+
+STACK (strict): Vite + React + TypeScript, Tailwind, gsap (ScrollTrigger, SplitText), lenis, three, @react-three/fiber, @react-three/drei, @react-three/postprocessing. Do NOT use framer-motion. No external model/HDRI files; all geometry procedural.
+
+PRODUCT (use only this for copy; no invented features, testimonials, logos or statistics)
+Web platform for interior fit-out and construction companies covering the whole lifecycle: lead capture and CRM, site visits, quantity surveying and BOQ generation, design/BOQ approval in a client portal, project scheduling (Gantt/CPM), progress validation, milestone billing, procurement and stock, subcontractor bidding (RFQ, quotes, award packs), progress claims and payment certificates with retention, variation/change-request control with client approval and re-baselining, configurable approval matrices, QuickBooks sync, project and company P&L, project close-out. Portals for Director, Project Manager, QS, Finance, Site Engineer, Client, Subcontractor and Admin. Role-based access, audit trail, dark mode.
+
+DESIGN TOKENS (match the product UI)
+primary #2A55A8, bright blue #3B82F6, sky #60A5FA, teal #2DD4BF (rare), copper #C4845A, orange #E07B39 (rare), ink #18181B, light #F3F5FA, dark scene #0F2027 → #1C3834. Fonts: Plus Jakarta Sans (UI/body) + Source Serif 4 (display, italic for emphasis words). Define as CSS variables. Radius 16px cards, 12px buttons. Blueprint hairlines, outlined giant numerals, minimal enterprise tone.
+
+ARCHITECTURE (strict)
+- ONE persistent <Canvas> fixed full-screen behind content (pointer-events none, dpr [1,1.5]). Content scrolls above it. Page height ~700vh.
+- Lenis synced to GSAP: lenis.on('scroll', ScrollTrigger.update); gsap.ticker.add(t => lenis.raf(t*1000)); gsap.ticker.lagSmoothing(0).
+- A global scroll-progress store (0..1) from a scrubbed ScrollTrigger. Inside useFrame the scene lerps toward it (factor ~0.08) so motion feels weighty and never snaps. No time-based tweens for scene transitions; everything is scroll-scrubbed. Consistent easing (power3.inOut / expo.out).
+
+SCENE
+- Procedural low-poly fit-out floor plan ~12x8 units: floor slabs, thin box walls forming 6-8 rooms with doorway gaps, furniture blocks (desks, sofa, pendant lights as cylinders/spheres), using instancing.
+- SIGNATURE EFFECT: each object has a build uniform uBuild (0..1) staggered by world position. At 0 it is only glowing blueprint edges (EdgesGeometry LineSegments, animated draw/dash reveal). As it rises, a bright blue scan-band sweeps upward through the object while the solid surface fades in behind it and the edges remain. Implement with custom ShaderMaterial / onBeforeCompile, not simple opacity.
+- Ground blueprint grid fading with distance, ~800 floating dust particles, fog, hemisphere light + cool blue key + warm copper rim, subtle bloom and vignette.
+
+SCROLL CHAPTERS (camera follows a CatmullRomCurve3 position path plus a separate look-at curve sampled by scroll; never cut)
+0-12% HERO: top-down blueprint, lines drawing in over ~2.5s. Huge serif headline (clamp 56-140px) split with SplitText into masked line reveals: "From first lead / to final account." with "final account" in italic copper. One-line subtext: "One platform for the whole fit-out lifecycle." Buttons: "Book a demo" (primary, magnetic hover) and "Sign in" (ghost). Animated scroll indicator. Cursor parallax on camera and dust. Preloader (0-100% counter with a thin blue line) that hands off into the hero draw-in.
+12-35% "01 PLAN IT": uBuild ramps with stagger; walls rise (scaleY with easeOutExpo, delay by distance from entrance) while the scan-band sweeps. Camera descends to a 3/4 isometric orbit rotating ~40°. Overlay text on the left with a giant outlined "01": lead capture, site visits, BOQ.
+35-60% "02 INSIDE": camera dollies through a doorway into one room. Pendant lights switch on one by one (emissive + point light ramp), floor turns wood tone, wall panels take palette accents. Pinned overlay with a counter 01→06 and swapping step titles (Lead, Site visit, BOQ, Client approval, Schedule, Billing) via a scrubbed GSAP timeline with masked slide transitions.
+60-80% "03 EXPLODE": building separates into 5 stacked layers (exploded axonometric): CRM, BOQ & Estimating, Scheduling, Procurement & Stock, Finance & P&L. Layers float apart with eased stagger and slow idle bobbing. Each gets a thin leader line and label in the DOM (projected from 3D). Hover highlights a layer (emissive up, others dim) and shows a one-line description.
+80-100% "04 CONVERGE": layers collapse into a single glowing core (bloom), particles spiral in, camera pulls back and slowly rotates. Final headline over it: "Build the whole project in one place." with the demo CTA.
+
+DOM CRAFT (on top of the scene, same visual language)
+1. Navbar: minimal, hides on scroll down, shows on scroll up; "Sign in" links to `${import.meta.env.VITE_APP_URL}/login`.
+2. Right-edge scroll progress rail with clickable chapter dots (lenis.scrollTo).
+3. Custom cursor: dot + trailing ring (gsap.quickTo), grows with "View/Drag/Open" labels on interactive elements; hidden on touch.
+4. Text system: all headings use SplitText line-mask reveals on enter; body text fades up with stagger; giant outlined section numerals. Alternate text left/right per chapter and keep copy out of the model's visual center on desktop.
+5. Marquee between chapters with outlined serif words (Leads — BOQ — Schedule — Procurement — Billing — Variations — P&L), speed tied to scroll velocity and direction, slight skew on fast scroll.
+6. Pinned horizontal-scroll "Portals" section: 8 tall cards (Director, Project Manager, QS, Finance, Site Engineer, Client, Subcontractor, Admin), each with role name, 3 bullets of what they do, and a mini UI mock built in HTML/CSS (no screenshots), with 3D tilt and a cursor-following glare on hover.
+7. "Financial control" section: an SVG path that draws on scroll connecting BOQ → Variation → Client approval → Re-baseline → Invoice → QuickBooks → P&L, nodes popping with a ring pulse when reached.
+8. Capability strip with digit-roll counters using truthful counts only ("8 role portals", "7 finance modules", "1 platform").
+9. Final section: demo form (name, company, email, phone, message) with validation and a success state; frontend only, submit handler isolated and clearly marked as the integration point. Footer with a huge wordmark.
+10. Magnetic buttons, link underline wipes.
+
+POLISH
+Postprocessing: low bloom, vignette, film grain, chromatic aberration only during fast scroll. Load sequence: preloader → canvas fade-in → hero lines draw → headline reveal, with no layout shift. Hero text must be visible before the 3D finishes loading.
+
+PERFORMANCE & ACCESSIBILITY
+Low-poly geometry, pause rendering when the tab is hidden or the canvas is offscreen, dispose resources on unmount, auto-downgrade quality if frame time stays above 24ms for 2s. Mobile (<768px): fewer particles, bloom only, simplified geometry, horizontal-pin section becomes a swipe carousel, keep the core scroll story. prefers-reduced-motion: static poster scene with simple fades. All copy is real DOM text, visible focus states, skip link, AA contrast, canvas aria-hidden. SEO: title, meta description, Open Graph.
+
+PRIORITY ORDER if you cannot do everything: (1) persistent canvas + build shader + hero, (2) the four scroll chapters with camera path, (3) navbar, progress rail, text system, final CTA form, (4) portals horizontal section and financial path, (5) cursor, marquee, counters, polish. Do not replace the 3D story with generic cards or sections at any point.
+
+Deliver a clean componentized codebase: Scene/, chapters/, shaders/, hooks/ (scroll store, lenis-gsap sync), sections/, and one tokens file, so each part can be tuned independently.

@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "JCT Fit-Outs ERP"
+description = "A cinematic scroll-driven landing page introducing JCT Fit-Outs ERP, a web platform for managing the full interior fit-out and construction project lifecycle."
+version = "1.0.0"
+id = "artifacts/jct-fit-outs-erp"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 26013
+
+[services.development]
+run = "pnpm --filter @workspace/jct-fit-outs-erp run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/jct-fit-outs-erp", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/jct-fit-outs-erp/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "26013"
+BASE_PATH = "/"

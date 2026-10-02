@@ -1,4 +1,4 @@
-import { useActiveChapterId, useScrollProgress, getCanvasOpacity, getMeasuredBoundaryValues } from '../hooks/scroll-store';
+import { useActiveChapterId, useScrollProgress, getCanvasOpacity, getMeasuredBoundaryValues, useCameraPos } from '../hooks/scroll-store';
 
 export function DebugOverlay() {
   const isDebug =
@@ -15,6 +15,7 @@ function DebugOverlayContent() {
   const activeChapterId = useActiveChapterId();
   const opacity = getCanvasOpacity();
   const boundaries = getMeasuredBoundaryValues();
+  const camPos = useCameraPos();
 
   return (
     <div
@@ -35,6 +36,12 @@ function DebugOverlayContent() {
         <div className="flex justify-between gap-4">
           <span className="text-emerald-500">Active Chapter:</span>
           <span className="font-bold text-amber-300">{activeChapterId}</span>
+        </div>
+        <div className="flex justify-between gap-4">
+          <span className="text-emerald-500">Camera Pos:</span>
+          <span className="font-bold text-emerald-200">
+            ({camPos.x.toFixed(1)}, {camPos.y.toFixed(1)}, {camPos.z.toFixed(1)})
+          </span>
         </div>
         <div className="flex justify-between gap-4">
           <span className="text-emerald-500">Canvas Opacity:</span>

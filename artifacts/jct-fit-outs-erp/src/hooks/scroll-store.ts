@@ -22,6 +22,8 @@ let canvasOpacity = 1;
 let activeChapterId: ChapterId = 'top';
 let scrollVelocity = 0;
 let activeLenis: Lenis | null = null;
+let activeExplodeLayer = 0;
+let currentCameraPos = { x: 0, y: 17, z: 2.5 };
 
 const listeners = new Set<() => void>();
 const publish = () => listeners.forEach((listener) => listener());
@@ -38,6 +40,28 @@ export const getActiveChapterIndex = () => {
   return index >= 0 ? index : 0;
 };
 export const getScrollVelocity = () => scrollVelocity;
+export const getActiveExplodeLayer = () => activeExplodeLayer;
+
+export const setActiveExplodeLayer = (index: number) => {
+  if (activeExplodeLayer !== index) {
+    activeExplodeLayer = index;
+    publish();
+  }
+};
+
+export function useActiveExplodeLayer() {
+  return useSyncExternalStore(subscribe, getActiveExplodeLayer, () => 0);
+}
+
+export const getCameraPos = () => currentCameraPos;
+export const setCameraPos = (x: number, y: number, z: number) => {
+  currentCameraPos = { x, y, z };
+  publish();
+};
+
+export function useCameraPos() {
+  return useSyncExternalStore(subscribe, getCameraPos, () => ({ x: 0, y: 17, z: 2.5 }));
+}
 
 export function getMeasuredBoundaryValues() {
   return {

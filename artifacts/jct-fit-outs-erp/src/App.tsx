@@ -17,6 +17,7 @@ import {
   Marquee,
   PlanChapter,
   PortalsSection,
+  PricingSection,
   SiteFooter,
 } from './sections/StorySections';
 
@@ -58,6 +59,7 @@ function App() {
           <Marquee />
           <PortalsSection />
           <FinanceSection />
+          <PricingSection />
           <CapabilityStrip />
           <DemoSection />
         </div>

@@ -97,8 +97,8 @@ function SceneWorld() {
   const coreRef = useRef<THREE.Group>(null);
   const coreMaterial = useRef<THREE.MeshStandardMaterial>(null);
   const coreLight = useRef<THREE.PointLight>(null);
-  useFrame(() => {
-    smooth.current = THREE.MathUtils.lerp(smooth.current, getScrollProgress(), .08);
+  useFrame((_, delta) => {
+    smooth.current = THREE.MathUtils.damp(smooth.current, getScrollProgress(), 6, delta);
     blueprintRef.current = Math.max(.4, THREE.MathUtils.clamp(smooth.current / .12, 0, 1));
     buildRef.current = THREE.MathUtils.clamp((smooth.current - .12) / .23, 0, 1);
     insideRef.current = THREE.MathUtils.clamp((smooth.current - .35) / .25, 0, 1);
@@ -108,10 +108,22 @@ function SceneWorld() {
     const aim = lookCurve.getPoint(smooth.current);
     position.x += pointer.x * .22;
     position.y += pointer.y * .13;
-    camera.position.lerp(position, .08);
-    target.current.lerp(aim, .08);
+
+    camera.position.x = THREE.MathUtils.damp(camera.position.x, position.x, 6, delta);
+    camera.position.y = THREE.MathUtils.damp(camera.position.y, position.y, 6, delta);
+    camera.position.z = THREE.MathUtils.damp(camera.position.z, position.z, 6, delta);
+
+    target.current.x = THREE.MathUtils.damp(target.current.x, aim.x, 6, delta);
+    target.current.y = THREE.MathUtils.damp(target.current.y, aim.y, 6, delta);
+    target.current.z = THREE.MathUtils.damp(target.current.z, aim.z, 6, delta);
+
     camera.lookAt(target.current);
-    if (group.current) group.current.rotation.y = THREE.MathUtils.lerp(group.current.rotation.y, explodeRef.current * .28 + convergeRef.current * .65, .06);
+
+    if (group.current) {
+      const rotTarget = explodeRef.current * .28 + convergeRef.current * .65;
+      group.current.rotation.y = THREE.MathUtils.damp(group.current.rotation.y, rotTarget, 4.5, delta);
+    }
+
     if (coreRef.current) coreRef.current.scale.setScalar(.3 + convergeRef.current * 1.1);
     if (coreMaterial.current) coreMaterial.current.emissiveIntensity = convergeRef.current * 4;
     if (coreLight.current) coreLight.current.intensity = convergeRef.current * 4;

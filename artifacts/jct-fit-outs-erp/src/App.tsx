@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import gsap from 'gsap';
 import { SceneGate } from './Scene/SceneGate';
 import { Cursor } from './components/Cursor';
+import { DebugOverlay } from './components/DebugOverlay';
 import { Preloader } from './components/Preloader';
 import { ProgressRail } from './components/ProgressRail';
 import { SiteNav } from './components/SiteNav';
@@ -45,6 +46,7 @@ function App() {
       <div aria-hidden="true" className="scene-wash" />
       <SiteNav />
       <ProgressRail />
+      <DebugOverlay />
       <Preloader />
       <Cursor />
       <main id="main-content">

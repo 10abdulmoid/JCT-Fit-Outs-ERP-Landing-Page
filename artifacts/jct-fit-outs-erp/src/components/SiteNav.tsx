@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
 import { ArrowUpRight, Menu, X } from 'lucide-react';
-
-const loginUrl = `${import.meta.env.VITE_APP_URL || ''}/login`;
+import { useAuthUrl } from '../hooks/use-auth-url';
 
 export function SiteNav() {
   const [shown, setShown] = useState(true);
   const [menuOpen, setMenuOpen] = useState(false);
+  const auth = useAuthUrl();
+
   useEffect(() => {
     let previous = window.scrollY;
     const update = () => {
@@ -17,7 +18,9 @@ export function SiteNav() {
     window.addEventListener('scroll', update, { passive: true });
     return () => window.removeEventListener('scroll', update);
   }, []);
+
   const close = () => setMenuOpen(false);
+
   return (
     <header className={`fixed inset-x-0 top-0 z-40 px-5 md:px-10 transition-transform duration-500 ${shown ? 'translate-y-0' : '-translate-y-full'}`}>
       <nav aria-label="Main navigation" className="mx-auto flex max-w-[1440px] items-center justify-between border-b border-white/15 py-5 text-white">
@@ -29,7 +32,15 @@ export function SiteNav() {
           <a className="nav-link" href="#plan">Platform</a>
           <a className="nav-link" href="#portals">Portals</a>
           <a className="nav-link" href="#finance">Finance</a>
-          <a href={loginUrl} className="nav-link flex items-center gap-1">Sign in <ArrowUpRight size={13} /></a>
+          <a
+            href={auth.url}
+            aria-disabled={auth.isDisabled}
+            tabIndex={auth.isDisabled ? -1 : undefined}
+            onClick={auth.isDisabled ? (e) => e.preventDefault() : undefined}
+            className={`nav-link flex items-center gap-1 ${auth.isDisabled ? 'opacity-50 cursor-not-allowed pointer-events-none' : ''}`}
+          >
+            Sign in <ArrowUpRight size={13} />
+          </a>
           <a href="#demo" className="magnetic btn-primary px-5 py-3 text-[11px] font-semibold">Book a demo</a>
         </div>
         <button type="button" className="md:hidden rounded-md border border-white/30 p-2" aria-label={menuOpen ? 'Close menu' : 'Open menu'} aria-expanded={menuOpen} onClick={() => setMenuOpen((value) => !value)}>
@@ -38,8 +49,22 @@ export function SiteNav() {
       </nav>
       {menuOpen && <div className="absolute inset-x-4 top-[76px] rounded-xl border border-white/15 bg-[#10232c]/95 p-5 text-white shadow-2xl backdrop-blur-xl md:hidden">
         <div className="flex flex-col gap-5 text-sm">
-          <a href="#plan" onClick={close}>Platform</a><a href="#portals" onClick={close}>Portals</a><a href="#finance" onClick={close}>Finance</a>
-          <a href={loginUrl} onClick={close}>Sign in</a><a href="#demo" onClick={close} className="btn-primary px-4 py-3 text-center">Book a demo</a>
+          <a href="#plan" onClick={close}>Platform</a>
+          <a href="#portals" onClick={close}>Portals</a>
+          <a href="#finance" onClick={close}>Finance</a>
+          <a
+            href={auth.url}
+            aria-disabled={auth.isDisabled}
+            tabIndex={auth.isDisabled ? -1 : undefined}
+            onClick={(e) => {
+              if (auth.isDisabled) e.preventDefault();
+              close();
+            }}
+            className={auth.isDisabled ? 'opacity-50 cursor-not-allowed pointer-events-none' : ''}
+          >
+            Sign in
+          </a>
+          <a href="#demo" onClick={close} className="btn-primary px-4 py-3 text-center">Book a demo</a>
         </div>
       </div>}
     </header>

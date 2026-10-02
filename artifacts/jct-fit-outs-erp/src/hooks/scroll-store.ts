@@ -24,6 +24,7 @@ let scrollVelocity = 0;
 let activeLenis: Lenis | null = null;
 let activeExplodeLayer = 0;
 let currentCameraPos = { x: 0, y: 17, z: 2.5 };
+let drawCallsCount = 0;
 
 const listeners = new Set<() => void>();
 const publish = () => listeners.forEach((listener) => listener());
@@ -61,6 +62,18 @@ export const setCameraPos = (x: number, y: number, z: number) => {
 
 export function useCameraPos() {
   return useSyncExternalStore(subscribe, getCameraPos, () => ({ x: 0, y: 17, z: 2.5 }));
+}
+
+export const getDrawCalls = () => drawCallsCount;
+export const setDrawCalls = (calls: number) => {
+  if (drawCallsCount !== calls) {
+    drawCallsCount = calls;
+    publish();
+  }
+};
+
+export function useDrawCalls() {
+  return useSyncExternalStore(subscribe, getDrawCalls, () => 0);
 }
 
 export function getMeasuredBoundaryValues() {

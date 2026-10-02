@@ -43,11 +43,21 @@ export function SiteNav() {
   const close = () => setMenuOpen(false);
 
   return (
-    <header className={`fixed inset-x-0 top-0 z-40 px-5 md:px-10 transition-transform duration-500 ${shown ? 'translate-y-0' : '-translate-y-full'}`}>
+    <header
+      className={`fixed inset-x-0 top-0 z-40 transition-all duration-200 ${
+        shown ? 'translate-y-0' : '-translate-y-full'
+      }`}
+      style={{
+        backgroundColor: isLightPanel ? 'rgba(243, 245, 250, 0.8)' : 'rgba(15, 32, 39, 0.55)',
+        backdropFilter: 'blur(16px)',
+        WebkitBackdropFilter: 'blur(16px)',
+        borderBottom: isLightPanel ? '1px solid rgba(203, 213, 225, 0.8)' : '1px solid rgba(255, 255, 255, 0.15)',
+      }}
+    >
       <nav
         aria-label="Main navigation"
-        className={`mx-auto flex max-w-[1440px] items-center justify-between border-b py-5 transition-colors duration-200 ${
-          isLightPanel ? 'border-[#18181b]/15 text-[#18181b]' : 'border-white/15 text-white'
+        className={`mx-auto flex max-w-[1440px] items-center justify-between px-5 md:px-10 py-4 transition-colors duration-200 ${
+          isLightPanel ? 'text-[#18181b]' : 'text-white'
         }`}
       >
         <a href="#top" onClick={close} className="flex items-center gap-3" aria-label="JCT Fit-Outs ERP home">
@@ -60,19 +70,38 @@ export function SiteNav() {
           </span>
           <span className="text-[12px] font-semibold tracking-[.04em]">
             FIT-OUTS{' '}
-            <span className={`font-normal transition-colors duration-200 ${isLightPanel ? 'text-[#18181b]/60' : 'text-white/50'}`}>
+            <span
+              className={`font-normal transition-colors duration-200 ${
+                isLightPanel ? 'text-[#18181b]/60' : 'text-white/50'
+              }`}
+            >
               ERP
             </span>
           </span>
         </a>
         <div className="hidden items-center gap-9 text-[11px] font-medium tracking-[.06em] md:flex">
-          <a className="nav-link transition-colors duration-200" href="#plan">
+          <a
+            className={`nav-link transition-colors duration-200 ${
+              isLightPanel ? 'hover:text-[#2a55a8]' : 'hover:text-white'
+            }`}
+            href="#plan"
+          >
             Platform
           </a>
-          <a className="nav-link transition-colors duration-200" href="#portals">
+          <a
+            className={`nav-link transition-colors duration-200 ${
+              isLightPanel ? 'hover:text-[#2a55a8]' : 'hover:text-white'
+            }`}
+            href="#portals"
+          >
             Portals
           </a>
-          <a className="nav-link transition-colors duration-200" href="#finance">
+          <a
+            className={`nav-link transition-colors duration-200 ${
+              isLightPanel ? 'hover:text-[#2a55a8]' : 'hover:text-white'
+            }`}
+            href="#finance"
+          >
             Finance
           </a>
           <a
@@ -81,8 +110,8 @@ export function SiteNav() {
             tabIndex={auth.isDisabled ? -1 : undefined}
             onClick={auth.isDisabled ? (e) => e.preventDefault() : undefined}
             className={`nav-link flex items-center gap-1 transition-colors duration-200 ${
-              auth.isDisabled ? 'opacity-50 cursor-not-allowed pointer-events-none' : ''
-            }`}
+              isLightPanel ? 'hover:text-[#2a55a8]' : 'hover:text-white'
+            } ${auth.isDisabled ? 'opacity-50 cursor-not-allowed pointer-events-none' : ''}`}
           >
             Sign in <ArrowUpRight size={13} />
           </a>
@@ -103,7 +132,13 @@ export function SiteNav() {
         </button>
       </nav>
       {menuOpen && (
-        <div className="absolute inset-x-4 top-[76px] rounded-xl border border-white/15 bg-[#10232c]/95 p-5 text-white shadow-2xl backdrop-blur-xl md:hidden">
+        <div
+          className={`absolute inset-x-4 top-[72px] rounded-xl border p-5 shadow-2xl backdrop-blur-xl md:hidden ${
+            isLightPanel
+              ? 'border-[#18181b]/15 bg-[#f3f5fa]/95 text-[#18181b]'
+              : 'border-white/15 bg-[#10232c]/95 text-white'
+          }`}
+        >
           <div className="flex flex-col gap-5 text-sm">
             <a href="#plan" onClick={close}>
               Platform

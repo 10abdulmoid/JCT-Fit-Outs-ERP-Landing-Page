@@ -114,7 +114,10 @@ export function PlanChapter() {
 const process = ['Lead', 'Site visit', 'BOQ', 'Client approval', 'Schedule', 'Billing'];
 export function InsideChapter() {
   const progress = useScrollProgress();
-  const active = Math.min(5, Math.max(0, Math.floor((progress - .35) / .038)));
+  const scrollActive = Math.min(5, Math.max(0, Math.floor((progress - .35) / .038)));
+  const [selectedStep, setSelectedStep] = useState<number | null>(null);
+  const active = selectedStep ?? scrollActive;
+
   return (
     <section id="inside" className="chapter-shell dark-chapter px-6 md:px-[8.5vw]">
       <div className="relative z-10 grid w-full items-center gap-10 md:grid-cols-[.78fr_1.22fr]">
@@ -125,7 +128,22 @@ export function InsideChapter() {
           <div className="mt-10 flex items-center gap-4">
             <span className="display text-5xl text-[#60a5fa]">{String(active + 1).padStart(2, '0')}</span>
             <span className="h-px w-10 bg-white/30" />
-            <div><span className="eyebrow text-white/80">Project sequence</span><p className="mt-1 text-[15px]">{process[active]}</p></div>
+            <div>
+              <span className="eyebrow text-white/80">Project sequence</span>
+              <p className="mt-1 text-[15px] font-semibold text-white">{process[active]}</p>
+            </div>
+          </div>
+          <div className="mt-6 flex flex-wrap gap-2">
+            {process.map((step, idx) => (
+              <button
+                key={step}
+                type="button"
+                onClick={() => setSelectedStep(idx === selectedStep ? null : idx)}
+                className={`px-3 py-1.5 text-[10px] mono uppercase rounded border transition-colors ${idx === active ? 'bg-[#3b82f6] text-white border-[#3b82f6]' : 'border-white/20 text-white/70 hover:border-white/50'}`}
+              >
+                0{idx + 1} {step}
+              </button>
+            ))}
           </div>
         </div>
         <div className="relative mx-auto flex aspect-square w-full max-w-[530px] items-center justify-center">
@@ -139,7 +157,18 @@ export function InsideChapter() {
             <div className="absolute left-[31%] top-[9%] h-[55%] w-px bg-white/35" />
             <div className="absolute bottom-[11%] right-[10%] h-[25%] w-[26%] bg-[#71816f]/50" />
             <div className="absolute left-[14%] top-[19%] h-[13%] w-[27%] bg-[#a98b70]/50" />
-            {process.map((step, index) => <div key={step} className={`absolute flex items-center gap-2 transition-all duration-500 ${index === active ? 'scale-105 text-white' : 'text-white/45'}`} style={{ left: `${9 + (index % 3) * 28}%`, top: `${14 + Math.floor(index / 3) * 48}%` }}><span className={`h-2 w-2 rounded-full ${index === active ? 'bg-[#60a5fa] shadow-[0_0_14px_#60a5fa]' : 'bg-white/35'}`} /><span className="mono text-[7px] uppercase">{step}</span></div>)}
+            {process.map((step, index) => (
+              <button
+                key={step}
+                type="button"
+                onClick={() => setSelectedStep(index === selectedStep ? null : index)}
+                className={`absolute flex items-center gap-2 cursor-pointer transition-all duration-300 ${index === active ? 'scale-110 text-white font-bold' : 'text-white/45 hover:text-white/80'}`}
+                style={{ left: `${9 + (index % 3) * 28}%`, top: `${14 + Math.floor(index / 3) * 48}%` }}
+              >
+                <span className={`h-2.5 w-2.5 rounded-full transition-all ${index === active ? 'bg-[#60a5fa] shadow-[0_0_14px_#60a5fa]' : 'bg-white/35'}`} />
+                <span className="mono text-[8px] uppercase">{step}</span>
+              </button>
+            ))}
           </div>
           <span className="mono absolute bottom-1 right-0 text-[8px] text-white/60">LIVE PROJECT / SEQUENCE 0{active + 1}</span>
         </div>
@@ -214,15 +243,118 @@ const portalData: [string, string[]][] = [
   ['Admin', ['Role-based access', 'Approval matrices', 'Audit trail + dark mode']],
 ];
 function PortalMock({ index }: { index: number }) {
+  const roleUis = [
+    // Director
+    <div key={0} className="space-y-2">
+      <div className="flex justify-between items-center bg-[#2a55a8]/10 p-2 rounded text-[9px] font-mono">
+        <span>COMPANY P&L MARGIN</span>
+        <span className="text-emerald-600 font-bold">+24.8%</span>
+      </div>
+      <div className="h-12 bg-white/80 border border-[#2a55a8]/15 rounded p-2 flex items-end gap-1">
+        {[40, 65, 55, 80, 95, 85].map((h, i) => (
+          <div key={i} className="flex-1 bg-[#3b82f6]/60 rounded-t" style={{ height: `${h}%` }} />
+        ))}
+      </div>
+    </div>,
+    // PM
+    <div key={1} className="space-y-1.5">
+      <div className="text-[8px] font-mono text-[#2a55a8] flex justify-between">
+        <span>GANTT / CRITICAL PATH</span>
+        <span>82% ON TIME</span>
+      </div>
+      {['M&E First Fix', 'Partition Walls', 'Ceiling Grid', 'Joinery'].map((task, i) => (
+        <div key={task} className="flex items-center gap-2 text-[8px] bg-white/70 p-1 rounded border border-[#2a55a8]/10">
+          <span className="w-16 truncate font-medium">{task}</span>
+          <div className="flex-1 bg-gray-100 rounded-full h-1.5 overflow-hidden">
+            <div className="bg-[#3b82f6] h-full rounded-full" style={{ width: `${(i + 1) * 22}%` }} />
+          </div>
+        </div>
+      ))}
+    </div>,
+    // QS
+    <div key={2} className="space-y-1.5">
+      <div className="text-[8px] font-mono text-[#2a55a8] flex justify-between">
+        <span>BOQ MEASUREMENT</span>
+        <span>AED 1.2M</span>
+      </div>
+      <div className="border border-[#2a55a8]/15 rounded bg-white/90 overflow-hidden text-[8px]">
+        <div className="grid grid-cols-3 bg-[#2a55a8]/10 p-1 font-bold"><span>ITEM</span><span>QTY</span><span>RATE</span></div>
+        <div className="grid grid-cols-3 p-1 border-b border-gray-100"><span>1.1 Drywall</span><span>450m²</span><span>120</span></div>
+        <div className="grid grid-cols-3 p-1"><span>1.2 Glass Partition</span><span>120m²</span><span>480</span></div>
+      </div>
+    </div>,
+    // Finance
+    <div key={3} className="space-y-1.5">
+      <div className="text-[8px] font-mono text-[#2a55a8] flex justify-between">
+        <span>MILESTONE INVOICING</span>
+        <span className="text-[#3b82f6] font-bold">QBO SYNC OK</span>
+      </div>
+      <div className="bg-white/80 p-2 rounded border border-[#2a55a8]/15 space-y-1">
+        <div className="flex justify-between text-[8px]"><span>Cert #04 Submitted</span><span className="font-mono font-bold">AED 340,000</span></div>
+        <div className="flex justify-between text-[7px] text-gray-500"><span>Retention 10% Held</span><span>AED 34,000</span></div>
+      </div>
+    </div>,
+    // Site Engineer
+    <div key={4} className="space-y-1.5">
+      <div className="text-[8px] font-mono text-[#2a55a8] flex justify-between">
+        <span>SITE INSPECTION</span>
+        <span className="text-emerald-600">PASSED</span>
+      </div>
+      {['M&E Rough-in check', 'Acoustic insulation audit'].map((chk) => (
+        <div key={chk} className="flex items-center gap-2 bg-white/80 p-1.5 rounded text-[8px] border border-[#2a55a8]/10">
+          <Check className="w-3 h-3 text-emerald-600" />
+          <span>{chk}</span>
+        </div>
+      ))}
+    </div>,
+    // Client
+    <div key={5} className="space-y-1.5">
+      <div className="text-[8px] font-mono text-[#2a55a8] flex justify-between">
+        <span>VARIATION APPROVAL</span>
+        <span className="bg-amber-100 text-amber-800 px-1 rounded">PENDING</span>
+      </div>
+      <div className="bg-white/90 p-2 rounded border border-[#2a55a8]/15 text-[8px]">
+        <p className="font-semibold">VO-03: Acoustic Glass Upgrade</p>
+        <p className="text-gray-500 mt-0.5">+AED 28,500 | +2 Days Impact</p>
+      </div>
+    </div>,
+    // Subcontractor
+    <div key={6} className="space-y-1.5">
+      <div className="text-[8px] font-mono text-[#2a55a8] flex justify-between">
+        <span>RFQ INVITATION</span>
+        <span>AWARDED</span>
+      </div>
+      <div className="bg-white/80 p-2 rounded border border-[#2a55a8]/15 text-[8px] space-y-1">
+        <div className="flex justify-between"><span>Package: Joinery & Fitments</span><span className="font-bold">AED 210,000</span></div>
+        <div className="text-[7px] text-emerald-600">✓ Award letter issued</div>
+      </div>
+    </div>,
+    // Admin
+    <div key={7} className="space-y-1.5">
+      <div className="text-[8px] font-mono text-[#2a55a8] flex justify-between">
+        <span>ACCESS & APPROVALS</span>
+        <span>MATRIX ACTIVE</span>
+      </div>
+      <div className="bg-white/90 p-1.5 rounded border border-[#2a55a8]/15 text-[8px] space-y-1">
+        <div className="flex justify-between items-center"><span>VO Approval Threshold</span><span className="font-mono bg-gray-100 px-1 rounded">&gt; AED 50k</span></div>
+        <div className="flex justify-between items-center"><span>Audit Trail Log</span><span className="text-emerald-600 font-mono">ENABLED</span></div>
+      </div>
+    </div>
+  ];
+
   return (
     <div className="mini-panel mt-7" aria-hidden="true">
-      <div className="mb-3 flex items-center justify-between"><span className="mono text-[7px] text-[#2a55a8]">JCT / PORTAL</span><span className="h-2 w-2 rounded-full bg-[#2dd4bf]" /></div>
-      <div className="flex gap-2"><div className="w-[23%] space-y-2 border-r border-[#2a55a8]/15 pr-2"><div className="mini-line blue" /><div className="mini-line" /><div className="mini-line" /><div className="mini-line" /></div>
-        <div className="flex-1"><div className="mb-3 flex justify-between"><div className="mini-line blue w-[42%]" /><div className="h-4 w-[22%] rounded bg-[#3b82f6]/15" /></div>
-          {[0, 1, 2].map((row) => <div key={row} className="mb-2 flex items-center gap-2 rounded border border-[#2a55a8]/10 bg-white/60 p-2"><span className={`h-4 w-4 rounded-sm ${row === index % 3 ? 'bg-[#3b82f6]/40' : 'bg-[#2a55a8]/10'}`} /><div className="flex-1"><div className="mini-line w-[70%]" /><div className="mini-line w-[44%]" /></div><span className="mono text-[6px] text-[#2a55a8]">0{row + 1}</span></div>)}
-        </div>
+      <div className="mb-3 flex items-center justify-between">
+        <span className="mono text-[7px] text-[#2a55a8]">JCT / PORTAL {String(index + 1).padStart(2, '0')}</span>
+        <span className="h-2 w-2 rounded-full bg-[#2dd4bf]" />
       </div>
-      <div className="mt-3 flex justify-between border-t border-[#2a55a8]/15 pt-2"><span className="mono text-[7px] text-[#2a55a8]">WORKSPACE / {String(index + 1).padStart(2, '0')}</span><span className="h-1 w-10 rounded bg-[#3b82f6]/35" /></div>
+      <div className="min-h-[105px]">
+        {roleUis[index % roleUis.length]}
+      </div>
+      <div className="mt-3 flex justify-between border-t border-[#2a55a8]/15 pt-2">
+        <span className="mono text-[7px] text-[#2a55a8]">ROLE WORKSPACE</span>
+        <span className="h-1 w-10 rounded bg-[#3b82f6]/35" />
+      </div>
     </div>
   );
 }
@@ -274,10 +406,21 @@ export function PortalsSection() {
   );
 }
 
-const financeSteps = ['BOQ', 'Variation', 'Client approval', 'Re-baseline', 'Invoice', 'QuickBooks', 'P&L'];
+const financeSteps = [
+  { name: 'BOQ', desc: 'Initial baseline budget & scope items created from site survey.' },
+  { name: 'Variation', desc: 'Site change requests & variations logged with impact cost.' },
+  { name: 'Client approval', desc: 'Digital client sign-off via portal with full audit trail.' },
+  { name: 'Re-baseline', desc: 'Contract scope & timeline auto-updated across all schedules.' },
+  { name: 'Invoice', desc: 'Milestone progress claims & retention certificates generated.' },
+  { name: 'QuickBooks', desc: 'Direct 2-way sync of ledger entries, invoices, and payments.' },
+  { name: 'P&L', desc: 'Real-time project & company gross margin tracking.' },
+];
+
 export function FinanceSection() {
   const container = useRef<HTMLElement>(null);
   const svg = useRef<SVGSVGElement>(null);
+  const [activeStep, setActiveStep] = useState(0);
+
   useEffect(() => {
     if (!container.current || !svg.current || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     const path = svg.current.querySelector<SVGPathElement>('.finance-path');
@@ -288,6 +431,7 @@ export function FinanceSection() {
     const nodeTween = gsap.fromTo(nodes, { scale: .4, opacity: .25, transformOrigin: 'center' }, { scale: 1, opacity: 1, stagger: .12, ease: 'back.out(1.7)', scrollTrigger: { trigger: container.current, start: 'top 62%', end: 'bottom 55%', scrub: .8 } });
     return () => { tween.scrollTrigger?.kill(); nodeTween.scrollTrigger?.kill(); tween.kill(); nodeTween.kill(); };
   }, []);
+
   return (
     <section id="finance" ref={container} className="light-panel relative px-6 py-24 md:px-[8.5vw] md:py-32">
       <div className="grid gap-12 md:grid-cols-[.75fr_1.25fr]">
@@ -295,20 +439,166 @@ export function FinanceSection() {
           <ChapterLabel number="05" label="Financial control" light />
           <RevealHeading className="chapter-title display mt-7 text-[#18181b]">Changes,<br />kept in <em>control.</em></RevealHeading>
           <p className="mt-6 max-w-[360px] text-sm leading-7 text-[#374151]">Control change requests through client approval and re-baselining, then connect progress claims, payment certificates with retention, billing, QuickBooks sync and project / company P&L through close-out.</p>
-          <div className="mt-8 flex items-center gap-3 border-t border-[#2a55a8]/20 pt-5"><span className="h-2 w-2 rounded-full bg-[#2dd4bf]" /><span className="eyebrow text-[#2a55a8]">Commercial workflow / connected</span></div>
+
+          <div className="mt-8 rounded-lg border border-[#2a55a8]/20 bg-white/80 p-4 shadow-sm">
+            <div className="flex items-center gap-2 text-[10px] font-mono text-[#2a55a8] uppercase font-semibold">
+              <span className="h-2 w-2 rounded-full bg-[#3b82f6]" />
+              0{activeStep + 1} — {financeSteps[activeStep].name}
+            </div>
+            <p className="mt-2 text-xs leading-5 text-[#18181b]">
+              {financeSteps[activeStep].desc}
+            </p>
+          </div>
+
+          <div className="mt-6 flex items-center gap-3 border-t border-[#2a55a8]/20 pt-5">
+            <span className="h-2 w-2 rounded-full bg-[#2dd4bf]" />
+            <span className="eyebrow text-[#2a55a8]">Commercial workflow / connected</span>
+          </div>
         </div>
         <div className="relative min-h-[450px]">
           <svg ref={svg} className="absolute inset-0 h-full w-full" viewBox="0 0 680 440" preserveAspectRatio="none" aria-hidden="true">
             <path className="finance-path" d="M58 71 C155 71 150 159 247 159 S340 246 437 246 S532 334 625 334" fill="none" stroke="#3b82f6" strokeWidth="2" />
-            {[['58','71'],['153','111'],['247','159'],['342','202'],['437','246'],['531','289'],['625','334']].map(([x,y],i) => <g key={i} className="finance-node"><circle cx={x} cy={y} r="11" fill="#f3f5fa" stroke="#3b82f6" strokeWidth="1.5" /><circle cx={x} cy={y} r="4" fill="#3b82f6" /></g>)}
+            {[['58','71'],['153','111'],['247','159'],['342','202'],['437','246'],['531','289'],['625','334']].map(([x,y],i) => (
+              <g key={i} className="finance-node cursor-pointer" onClick={() => setActiveStep(i)}>
+                <circle cx={x} cy={y} r="14" fill={activeStep === i ? '#3b82f6' : '#f3f5fa'} stroke="#3b82f6" strokeWidth="2" />
+                <circle cx={x} cy={y} r="5" fill={activeStep === i ? '#ffffff' : '#3b82f6'} />
+              </g>
+            ))}
           </svg>
           <div className="relative grid h-full grid-cols-2 grid-rows-4 gap-4 py-2 md:grid-cols-4 md:grid-rows-2">
-            {financeSteps.map((step, index) => <div key={step} className={`flex flex-col justify-between ${index % 2 ? 'md:mt-24' : ''} ${index === 6 ? 'col-start-2 md:col-start-4' : ''}`}>
-              <span className="mono text-[8px] text-[#2a55a8]">0{index + 1} / FLOW</span>
-              <span className="mt-12 max-w-[120px] text-[11px] font-semibold leading-5 text-[#18181b]">{step}</span>
-            </div>)}
+            {financeSteps.map((step, index) => (
+              <button
+                key={step.name}
+                type="button"
+                onClick={() => setActiveStep(index)}
+                className={`flex flex-col justify-between text-left cursor-pointer p-2 rounded transition-all ${index % 2 ? 'md:mt-24' : ''} ${index === 6 ? 'col-start-2 md:col-start-4' : ''} ${activeStep === index ? 'bg-white shadow-md border border-[#3b82f6]/30' : 'hover:bg-white/40'}`}
+              >
+                <span className={`mono text-[8px] ${activeStep === index ? 'text-[#3b82f6] font-bold' : 'text-[#2a55a8]'}`}>0{index + 1} / FLOW</span>
+                <span className={`mt-8 max-w-[120px] text-[11px] font-semibold leading-5 ${activeStep === index ? 'text-[#3b82f6]' : 'text-[#18181b]'}`}>{step.name}</span>
+              </button>
+            ))}
           </div>
         </div>
+      </div>
+    </section>
+  );
+}
+
+export function PricingSection() {
+  const [annual, setAnnual] = useState(true);
+
+  const plans = [
+    {
+      name: 'Starter',
+      target: 'Specialist contractors & small fit-out teams',
+      monthlyPrice: '$299',
+      annualPrice: '$249',
+      features: [
+        'Up to 5 Active Projects',
+        '3 Role Portals (QS, PM, Admin)',
+        'BOQ & Estimating module',
+        'Basic Gantt Scheduling',
+        'Standard Email Support',
+      ],
+      popular: false,
+    },
+    {
+      name: 'Professional',
+      target: 'Growing fit-out firms & main contractors',
+      monthlyPrice: '$699',
+      annualPrice: '$579',
+      features: [
+        'Up to 20 Active Projects',
+        'All 8 Role Portals',
+        'Full Commercial & Variation Flow',
+        'CPM Scheduling & Baseline Tracking',
+        'QuickBooks & Accounting Integration',
+        'Subcontractor RFQ & Award Packs',
+        'Priority Phone & Chat Support',
+      ],
+      popular: true,
+    },
+    {
+      name: 'Enterprise',
+      target: 'Large scale interior fit-out enterprises',
+      monthlyPrice: 'Custom',
+      annualPrice: 'Custom',
+      features: [
+        'Unlimited Active Projects',
+        'Unlimited User Accounts & Portals',
+        'Custom Approval Matrices & SLA',
+        'Dedicated ERP Onboarding Manager',
+        'Custom API & ERP Integrations',
+        '24/7 Dedicated Support',
+      ],
+      popular: false,
+    },
+  ];
+
+  return (
+    <section id="pricing" className="light-panel relative border-t border-[#2a55a8]/15 px-6 py-24 md:px-[8.5vw] md:py-32">
+      <div className="mb-14 text-center">
+        <p className="eyebrow inline-block text-[#2a55a8]">PRICING & PLANS</p>
+        <RevealHeading className="chapter-title display mt-4 text-[#18181b]">Simple, transparent <em>pricing.</em></RevealHeading>
+        <p className="mx-auto mt-4 max-w-[500px] text-xs leading-6 text-[#374151]">
+          Scale your fit-out operations with plans tailored to your team size and project volume.
+        </p>
+
+        <div className="mt-8 flex items-center justify-center gap-3">
+          <span className={`text-xs ${!annual ? 'font-bold text-[#18181b]' : 'text-gray-500'}`}>Monthly</span>
+          <button
+            type="button"
+            onClick={() => setAnnual(!annual)}
+            className="relative h-6 w-11 rounded-full bg-[#2a55a8] p-1 transition-colors"
+          >
+            <div className={`h-4 w-4 rounded-full bg-white transition-transform ${annual ? 'translate-x-5' : 'translate-x-0'}`} />
+          </button>
+          <span className={`text-xs ${annual ? 'font-bold text-[#18181b]' : 'text-gray-500'}`}>
+            Annual <span className="ml-1 rounded bg-emerald-100 px-1.5 py-0.5 text-[9px] font-bold text-emerald-800">SAVE 20%</span>
+          </span>
+        </div>
+      </div>
+
+      <div className="grid gap-8 md:grid-cols-3">
+        {plans.map((plan) => (
+          <div
+            key={plan.name}
+            className={`relative flex flex-col justify-between rounded-xl border bg-white/80 p-8 backdrop-blur-sm transition-shadow hover:shadow-lg ${plan.popular ? 'border-[#3b82f6] shadow-md ring-2 ring-[#3b82f6]/20' : 'border-[#2a55a8]/15'}`}
+          >
+            {plan.popular && (
+              <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-[#3b82f6] px-3 py-1 text-[9px] font-bold uppercase tracking-wider text-white">
+                MOST POPULAR
+              </span>
+            )}
+            <div>
+              <h3 className="display text-2xl text-[#18181b]">{plan.name}</h3>
+              <p className="mt-2 min-h-[36px] text-[11px] text-[#52525b]">{plan.target}</p>
+
+              <div className="mt-6 border-b border-gray-100 pb-6">
+                <span className="display text-4xl font-bold text-[#18181b]">
+                  {annual ? plan.annualPrice : plan.monthlyPrice}
+                </span>
+                {plan.monthlyPrice !== 'Custom' && <span className="text-xs text-gray-500"> / month</span>}
+              </div>
+
+              <ul className="mt-6 space-y-3">
+                {plan.features.map((feature) => (
+                  <li key={feature} className="flex items-start gap-2.5 text-xs text-[#374151]">
+                    <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#3b82f6]" />
+                    <span>{feature}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <a
+              href="#demo"
+              className={`mt-8 inline-flex w-full justify-center rounded-lg py-3 text-xs font-semibold transition-colors ${plan.popular ? 'bg-[#3b82f6] text-white hover:bg-[#2563eb]' : 'border border-[#2a55a8]/30 text-[#2a55a8] hover:bg-[#2a55a8]/5'}`}
+            >
+              Get started with {plan.name}
+            </a>
+          </div>
+        ))}
       </div>
     </section>
   );

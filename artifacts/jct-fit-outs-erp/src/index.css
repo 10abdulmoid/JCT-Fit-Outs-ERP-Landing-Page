@@ -93,7 +93,7 @@
 }
 
 .site-shell { position: relative; min-height: 100dvh; isolation: isolate; overflow: clip; }
-.scene-canvas { position: fixed !important; inset: 0; z-index: -2; pointer-events: none; opacity: 0; animation: canvas-in 1.2s .2s forwards; }
+.scene-canvas { position: fixed !important; inset: 0; z-index: -2; pointer-events: none; opacity: 0; animation: canvas-in 1.2s .2s forwards; transition: opacity 0.2s linear; }
 .scene-poster { overflow:hidden; background:radial-gradient(ellipse at 72% 44%,rgba(35,92,91,.64),transparent 42%),linear-gradient(135deg,#0f2027,#142e34 54%,#1c3834); }
 .scene-poster__grid { position:absolute; inset:-20%; opacity:.22; background-image:linear-gradient(rgba(96,165,250,.22) 1px,transparent 1px),linear-gradient(90deg,rgba(96,165,250,.22) 1px,transparent 1px); background-size:48px 48px; transform:perspective(850px) rotateX(58deg) scale(1.45); transform-origin:center 70%; mask-image:linear-gradient(transparent 4%,#000 30%,#000 72%,transparent 94%); }
 .scene-poster__plan { position:absolute; top:47%; right:-2vw; width:min(77vw,1040px); height:auto; transform:translateY(-48%); filter:drop-shadow(0 0 24px rgba(59,130,246,.16)); opacity:.87; }
@@ -101,7 +101,7 @@
 @media (max-width:767px) { .scene-poster__plan { width:145vw; max-width:none; right:-61vw; top:45%; opacity:.62; } .scene-poster__caption { right:6vw; bottom:3vh; font-size:7px; } }
 @media (prefers-reduced-motion:reduce) { .scene-poster,.scene-poster__plan { animation:none !important; } }
 @keyframes canvas-in { to { opacity: 1; } }
-.scene-wash { position: fixed; inset: 0; z-index: -1; pointer-events:none; background: linear-gradient(90deg,rgba(10,25,34,.9) 0%,rgba(10,25,34,.72) 37%,rgba(10,25,34,.13) 76%,rgba(10,25,34,.28) 100%); }
+.scene-wash { position: fixed; inset: 0; z-index: -1; pointer-events:none; background: linear-gradient(90deg,rgba(10,25,34,.9) 0%,rgba(10,25,34,.72) 37%,rgba(10,25,34,.13) 76%,rgba(10,25,34,.28) 100%); transition: opacity 0.2s linear; }
 .site-noise::after { content:''; position:fixed; inset:0; pointer-events:none; z-index:8; opacity:.045; background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E"); }
 .mono { font-family: var(--app-font-mono); letter-spacing: .08em; }
 .display { font-family: var(--app-font-serif); font-weight: 500; }

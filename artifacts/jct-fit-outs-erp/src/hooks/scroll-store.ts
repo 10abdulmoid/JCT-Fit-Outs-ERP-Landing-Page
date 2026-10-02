@@ -120,6 +120,11 @@ function updateSceneMetrics() {
     canvasEl.style.opacity = String(canvasOpacity);
   }
 
+  const washEl = document.querySelector('.scene-wash') as HTMLElement | null;
+  if (washEl) {
+    washEl.style.opacity = String(canvasOpacity);
+  }
+
   // Derive active chapter from real DOM element viewport positions
   const viewportThreshold = window.innerHeight * 0.4;
   let newActiveId: ChapterId = 'top';

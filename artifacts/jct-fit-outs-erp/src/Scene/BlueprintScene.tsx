@@ -78,7 +78,7 @@ function ExplodedLayers({ progressRef }: { progressRef: MutableRefObject<number>
 function SceneWorld() {
   const { camera, pointer } = useThree();
   const camCurve = useMemo(() => new THREE.CatmullRomCurve3([
-    new THREE.Vector3(0, 12, 1), new THREE.Vector3(8.2, 8.4, 10.8), new THREE.Vector3(4.1, 5.6, 8.8),
+    new THREE.Vector3(0, 16.5, 2.2), new THREE.Vector3(8.2, 8.4, 10.8), new THREE.Vector3(4.1, 5.6, 8.8),
     new THREE.Vector3(0, 3.3, 4.5), new THREE.Vector3(6, 8.2, 12), new THREE.Vector3(0, 11, 13),
     new THREE.Vector3(0, 8, 15),
   ]), []);
@@ -161,7 +161,7 @@ export function BlueprintScene() {
   if (reduced) return <StaticSceneFallback />;
   return (
     <SceneErrorBoundary>
-      <Canvas className="scene-canvas" aria-hidden="true" frameloop={visible ? 'always' : 'never'} dpr={[1, 1.5]} gl={{ antialias: true, alpha: false, powerPreference: 'low-power' }} camera={{ position: [0, 12, 1], fov: 37 }}>
+      <Canvas className="scene-canvas" aria-hidden="true" frameloop={visible ? 'always' : 'never'} dpr={[1, 1.5]} gl={{ antialias: true, alpha: false, powerPreference: 'low-power' }} camera={{ position: [0, 16.5, 2.2], fov: 37 }}>
         {visible && <SceneWorld />}
         {visible && <EffectComposer multisampling={0}><Bloom intensity={.52} luminanceThreshold={.76} luminanceSmoothing={.25} /><ChromaticAberration offset={new THREE.Vector2(.00028, .00028)} radialModulation={false} modulationOffset={0} /><Vignette eskil={false} offset={.22} darkness={.42} /></EffectComposer>}
       </Canvas>

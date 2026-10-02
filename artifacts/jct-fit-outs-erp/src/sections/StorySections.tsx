@@ -3,7 +3,8 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { SplitText } from 'gsap/SplitText';
 import { ArrowDown, ArrowRight, ArrowUpRight, Check, ChevronRight } from 'lucide-react';
-import { getScrollVelocity, useScrollProgress } from '../hooks/scroll-store';
+import { PLANS } from '../data/plans';
+import { getScrollVelocity, useScrollProgress, useActiveExplodeLayer, setActiveExplodeLayer } from '../hooks/scroll-store';
 import { useAuthUrl } from '../hooks/use-auth-url';
 
 gsap.registerPlugin(ScrollTrigger, SplitText);
@@ -83,27 +84,13 @@ export function PlanChapter() {
   return (
     <section id="plan" className="chapter-shell dark-chapter px-6 md:px-[8.5vw]">
       <span className="outlined-number pointer-events-none absolute -left-4 top-[17%]">01</span>
-      <div className="relative z-10 grid w-full items-center gap-12 md:grid-cols-[.8fr_1.2fr]">
-        <div className="max-w-[510px] md:pt-16">
+      <div className="relative z-10 grid w-full items-center gap-12 md:grid-cols-1">
+        <div className="max-w-[560px] md:pt-16">
           <ChapterLabel number="01" label="Plan it" />
           <RevealHeading className="chapter-title display mt-7 text-white">Every project<br />starts <em>here.</em></RevealHeading>
-          <p className="mt-6 max-w-[430px] text-sm leading-7 text-white/85">Capture the lead, record the site visit, and turn measured scope into a BOQ—before the project leaves the drawing board.</p>
-          <div className="mt-8 grid max-w-[440px] grid-cols-3 border-y border-white/20 py-4">
+          <p className="mt-6 max-w-[460px] text-sm leading-7 text-white/85">Capture the lead, record the site visit, and turn measured scope into a BOQ—before the project leaves the drawing board.</p>
+          <div className="mt-8 grid max-w-[480px] grid-cols-3 border-y border-white/20 py-4">
             {['Lead capture', 'Site visits', 'BOQ'].map((step, index) => <div key={step} className="border-r border-white/15 px-2 last:border-0 first:pl-0"><span className="mono block text-[9px] text-[#78aaff]">0{index + 1}</span><span className="mt-2 block text-[11px] text-white/90">{step}</span></div>)}
-          </div>
-        </div>
-        <div className="relative hidden h-[390px] md:block">
-          <div className="absolute right-0 top-4 w-[min(42vw,560px)] border border-white/20 bg-[#111f2a]/55 p-5 backdrop-blur-[3px]">
-            <div className="flex justify-between border-b border-white/15 pb-3"><span className="eyebrow text-white/85">Fit-out / floor plan</span><span className="mono text-[9px] text-[#78aaff]">DRAWING / BOQ</span></div>
-            <svg viewBox="0 0 460 280" className="mt-4 w-full" role="img" aria-label="Architectural floor plan drawing with room divisions">
-              <g fill="none" stroke="#8abaff" strokeWidth="1">
-                <path d="M32 25h397v225H32zM32 155h125v95M157 155h100v95M257 25v110M257 135h172M321 135v115M157 25v93M157 118h100" />
-                <path d="M32 117h25m45 0h55m-100 0a25 25 0 0 1 25 25M257 82h40m38 0h94m-94 0a38 38 0 0 1 38 38M257 207h35m42 0h73" strokeDasharray="3 4" />
-              </g>
-              <g fill="#8abaff" fontSize="7" fontFamily="monospace"><text x="56" y="91">MEETING</text><text x="185" y="70">WORKSPACE</text><text x="70" y="211">RECEPTION</text><text x="343" y="190">CLIENT ROOM</text></g>
-              <path d="M19 260h425" stroke="#c4845a" strokeWidth=".6" /><text x="20" y="273" fill="#c4845a" fontSize="7" fontFamily="monospace">SITE MEASUREMENT / QUANTITY SURVEYING</text>
-            </svg>
-            <div className="flex justify-between pt-3 text-[9px] text-white/60"><span>QS MEASUREMENT / REVIEW</span><span>JCT — 0147</span></div>
           </div>
         </div>
       </div>
@@ -120,57 +107,29 @@ export function InsideChapter() {
 
   return (
     <section id="inside" className="chapter-shell dark-chapter px-6 md:px-[8.5vw]">
-      <div className="relative z-10 grid w-full items-center gap-10 md:grid-cols-[.78fr_1.22fr]">
-        <div className="max-w-[460px]">
-          <ChapterLabel number="02" label="Inside the project" />
-          <RevealHeading className="chapter-title display mt-7 text-white">One clear<br />line of <em>progress.</em></RevealHeading>
-          <p className="mt-6 max-w-[400px] text-sm leading-7 text-white/85">Move from approved scope to Gantt / CPM scheduling, validate progress and connect the plan to milestone billing.</p>
-          <div className="mt-10 flex items-center gap-4">
-            <span className="display text-5xl text-[#60a5fa]">{String(active + 1).padStart(2, '0')}</span>
-            <span className="h-px w-10 bg-white/30" />
-            <div>
-              <span className="eyebrow text-white/80">Project sequence</span>
-              <p className="mt-1 text-[15px] font-semibold text-white">{process[active]}</p>
-            </div>
-          </div>
-          <div className="mt-6 flex flex-wrap gap-2">
-            {process.map((step, idx) => (
-              <button
-                key={step}
-                type="button"
-                onClick={() => setSelectedStep(idx === selectedStep ? null : idx)}
-                className={`px-3 py-1.5 text-[10px] mono uppercase rounded border transition-colors ${idx === active ? 'bg-[#3b82f6] text-white border-[#3b82f6]' : 'border-white/20 text-white/70 hover:border-white/50'}`}
-              >
-                0{idx + 1} {step}
-              </button>
-            ))}
+      <div className="relative z-10 max-w-[560px]">
+        <ChapterLabel number="02" label="Inside the project" />
+        <RevealHeading className="chapter-title display mt-7 text-white">One clear<br />line of <em>progress.</em></RevealHeading>
+        <p className="mt-6 max-w-[460px] text-sm leading-7 text-white/85">Move from approved scope to Gantt / CPM scheduling, validate progress and connect the plan to milestone billing.</p>
+        <div className="mt-8 flex items-center gap-4">
+          <span className="display text-5xl text-[#60a5fa]">{String(active + 1).padStart(2, '0')}</span>
+          <span className="h-px w-10 bg-white/30" />
+          <div>
+            <span className="eyebrow text-white/80">Project sequence</span>
+            <p className="mt-1 text-[15px] font-semibold text-white">{process[active]}</p>
           </div>
         </div>
-        <div className="relative mx-auto flex aspect-square w-full max-w-[530px] items-center justify-center">
-          <div className="absolute inset-[7%] rounded-full border border-white/10" />
-          <div className="absolute inset-[18%] rounded-full border border-dashed border-white/15" />
-          <div className="absolute h-[1px] w-full bg-white/10" /><div className="absolute h-full w-[1px] bg-white/10" />
-          <div className="relative flex h-[66%] w-[77%] rotate-[-9deg] items-center justify-center border border-[#85b5fa]/80 bg-[#24363b]/75 shadow-[0_0_60px_rgba(59,130,246,.16)]">
-            <div className="absolute inset-[9%] border border-white/20" />
-            <div className="absolute left-[50%] top-[9%] h-[55%] w-px bg-white/50" />
-            <div className="absolute left-[9%] top-[64%] h-px w-[82%] bg-white/50" />
-            <div className="absolute left-[31%] top-[9%] h-[55%] w-px bg-white/35" />
-            <div className="absolute bottom-[11%] right-[10%] h-[25%] w-[26%] bg-[#71816f]/50" />
-            <div className="absolute left-[14%] top-[19%] h-[13%] w-[27%] bg-[#a98b70]/50" />
-            {process.map((step, index) => (
-              <button
-                key={step}
-                type="button"
-                onClick={() => setSelectedStep(index === selectedStep ? null : index)}
-                className={`absolute flex items-center gap-2 cursor-pointer transition-all duration-300 ${index === active ? 'scale-110 text-white font-bold' : 'text-white/45 hover:text-white/80'}`}
-                style={{ left: `${9 + (index % 3) * 28}%`, top: `${14 + Math.floor(index / 3) * 48}%` }}
-              >
-                <span className={`h-2.5 w-2.5 rounded-full transition-all ${index === active ? 'bg-[#60a5fa] shadow-[0_0_14px_#60a5fa]' : 'bg-white/35'}`} />
-                <span className="mono text-[8px] uppercase">{step}</span>
-              </button>
-            ))}
-          </div>
-          <span className="mono absolute bottom-1 right-0 text-[8px] text-white/60">LIVE PROJECT / SEQUENCE 0{active + 1}</span>
+        <div className="mt-6 flex flex-wrap gap-2">
+          {process.map((step, idx) => (
+            <button
+              key={step}
+              type="button"
+              onClick={() => setSelectedStep(idx === selectedStep ? null : idx)}
+              className={`px-3 py-1.5 text-[10px] mono uppercase rounded border transition-colors ${idx === active ? 'bg-[#3b82f6] text-white border-[#3b82f6]' : 'border-white/20 text-white/70 hover:border-white/50'}`}
+            >
+              0{idx + 1} {step}
+            </button>
+          ))}
         </div>
       </div>
     </section>
@@ -185,7 +144,7 @@ const layers = [
   ['Finance & P&L', 'Claims, certificates, retention, billing and project P&L.'],
 ];
 export function ExplodeChapter() {
-  const [active, setActive] = useState(0);
+  const active = useActiveExplodeLayer();
   return (
     <section id="explode" className="chapter-shell dark-chapter px-6 md:px-[8.5vw]">
       <span className="outlined-number pointer-events-none absolute right-0 top-[14%]">03</span>
@@ -195,14 +154,27 @@ export function ExplodeChapter() {
           <RevealHeading className="chapter-title display mt-7 text-white">One project.<br /><em>Every layer.</em></RevealHeading>
           <p className="mt-6 max-w-[380px] text-sm leading-7 text-white/85">Connect the operational layers that take a fit-out from first conversation through close-out.</p>
           <div className="mt-8 max-w-[440px] border-t border-white/20 pt-5">
-            <p className="eyebrow text-[#78aaff]">{layers[active][0]}</p>
-            <p className="mt-2 max-w-[360px] text-xs leading-6 text-white/85">{layers[active][1]}</p>
+            <p className="eyebrow text-[#78aaff]">{layers[active]?.[0] || layers[0][0]}</p>
+            <p className="mt-2 max-w-[360px] text-xs leading-6 text-white/85">{layers[active]?.[1] || layers[0][1]}</p>
           </div>
         </div>
         <div className="flex flex-col justify-center gap-2 md:pl-[10%]">
-          {layers.map(([name], index) => <button key={name} type="button" onMouseEnter={() => setActive(index)} onFocus={() => setActive(index)} onClick={() => setActive(index)} className={`group flex items-center gap-4 border-b border-white/20 py-4 text-left transition-all ${active === index ? 'translate-x-2 text-white' : 'text-white/65'}`} aria-pressed={active === index}>
-            <span className="mono w-7 text-[9px] text-[#78aaff]">0{index + 1}</span><span className="h-px w-8 bg-[#78aaff]/50 transition-all group-hover:w-14" /><span className="flex-1 text-sm font-medium">{name}</span><ChevronRight size={15} className={active === index ? 'text-[#78aaff]' : 'opacity-0'} />
-          </button>)}
+          {layers.map(([name], index) => (
+            <button
+              key={name}
+              type="button"
+              onMouseEnter={() => setActiveExplodeLayer(index)}
+              onFocus={() => setActiveExplodeLayer(index)}
+              onClick={() => setActiveExplodeLayer(index)}
+              className={`group flex items-center gap-4 border-b border-white/20 py-4 text-left transition-all ${active === index ? 'translate-x-2 text-white' : 'text-white/65'}`}
+              aria-pressed={active === index}
+            >
+              <span className="mono w-7 text-[9px] text-[#78aaff]">0{index + 1}</span>
+              <span className="h-px w-8 bg-[#78aaff]/50 transition-all group-hover:w-14" />
+              <span className="flex-1 text-sm font-medium">{name}</span>
+              <ChevronRight size={15} className={active === index ? 'text-[#78aaff]' : 'opacity-0'} />
+            </button>
+          ))}
         </div>
       </div>
     </section>
@@ -346,14 +318,17 @@ function PortalMock({ index }: { index: number }) {
     <div className="mini-panel mt-7" aria-hidden="true">
       <div className="mb-3 flex items-center justify-between">
         <span className="mono text-[7px] text-[#2a55a8]">JCT / PORTAL {String(index + 1).padStart(2, '0')}</span>
-        <span className="h-2 w-2 rounded-full bg-[#2dd4bf]" />
+        <div className="flex items-center gap-1.5">
+          <span className="mono text-[6px] text-gray-500 uppercase tracking-tight bg-gray-100 px-1 py-0.5 rounded">sample data</span>
+          <span className="h-2 w-2 rounded-full bg-[#2dd4bf]" />
+        </div>
       </div>
       <div className="min-h-[105px]">
         {roleUis[index % roleUis.length]}
       </div>
-      <div className="mt-3 flex justify-between border-t border-[#2a55a8]/15 pt-2">
+      <div className="mt-3 flex justify-between items-center border-t border-[#2a55a8]/15 pt-2">
         <span className="mono text-[7px] text-[#2a55a8]">ROLE WORKSPACE</span>
-        <span className="h-1 w-10 rounded bg-[#3b82f6]/35" />
+        <span className="mono text-[6px] text-gray-400 uppercase tracking-wider">sample data</span>
       </div>
     </div>
   );
@@ -416,31 +391,91 @@ const financeSteps = [
   { name: 'P&L', desc: 'Real-time project & company gross margin tracking.' },
 ];
 
+function generateSplinePath(pts: { x: number; y: number }[]) {
+  if (pts.length === 0) return '';
+  let d = `M ${pts[0].x} ${pts[0].y}`;
+  for (let i = 0; i < pts.length - 1; i++) {
+    const p0 = pts[Math.max(0, i - 1)];
+    const p1 = pts[i];
+    const p2 = pts[i + 1];
+    const p3 = pts[Math.min(pts.length - 1, i + 2)];
+
+    const cp1x = p1.x + (p2.x - p0.x) / 6;
+    const cp1y = p1.y + (p2.y - p0.y) / 6;
+    const cp2x = p2.x - (p3.x - p1.x) / 6;
+    const cp2y = p2.y - (p3.y - p1.y) / 6;
+
+    d += ` C ${cp1x.toFixed(2)} ${cp1y.toFixed(2)}, ${cp2x.toFixed(2)} ${cp2y.toFixed(2)}, ${p2.x} ${p2.y}`;
+  }
+  return d;
+}
+
+const desktopNodes = Array.from({ length: 7 }, (_, i) => ({
+  x: 80 + i * 173,
+  y: 120 + Math.sin(i * 0.9) * 28,
+}));
+
+const mobileNodes = Array.from({ length: 7 }, (_, i) => ({
+  x: 130 + Math.sin(i * 0.9) * 28,
+  y: 80 + i * 135,
+}));
+
+const desktopPathD = generateSplinePath(desktopNodes);
+const mobilePathD = generateSplinePath(mobileNodes);
+
 export function FinanceSection() {
   const container = useRef<HTMLElement>(null);
-  const svg = useRef<SVGSVGElement>(null);
+  const desktopSvg = useRef<SVGSVGElement>(null);
+  const mobileSvg = useRef<SVGSVGElement>(null);
   const [activeStep, setActiveStep] = useState(0);
 
   useEffect(() => {
-    if (!container.current || !svg.current || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    const path = svg.current.querySelector<SVGPathElement>('.finance-path');
-    const nodes = svg.current.querySelectorAll('.finance-node');
-    const length = path?.getTotalLength() || 1;
-    if (path) { path.setAttribute('stroke-dasharray', `${length}`); path.setAttribute('stroke-dashoffset', `${length}`); }
-    const tween = gsap.to(path, { strokeDashoffset: 0, ease: 'none', scrollTrigger: { trigger: container.current, start: 'top 65%', end: 'bottom 60%', scrub: 1 } });
-    const nodeTween = gsap.fromTo(nodes, { scale: .4, opacity: .25, transformOrigin: 'center' }, { scale: 1, opacity: 1, stagger: .12, ease: 'back.out(1.7)', scrollTrigger: { trigger: container.current, start: 'top 62%', end: 'bottom 55%', scrub: .8 } });
-    return () => { tween.scrollTrigger?.kill(); nodeTween.scrollTrigger?.kill(); tween.kill(); nodeTween.kill(); };
+    if (!container.current || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    const desktopPath = desktopSvg.current?.querySelector<SVGPathElement>('.finance-path');
+    const mobilePath = mobileSvg.current?.querySelector<SVGPathElement>('.finance-path');
+
+    [desktopPath, mobilePath].forEach((path) => {
+      if (path) {
+        const length = path.getTotalLength();
+        path.setAttribute('stroke-dasharray', `${length}`);
+        path.setAttribute('stroke-dashoffset', `${length}`);
+      }
+    });
+
+    const trigger = ScrollTrigger.create({
+      trigger: container.current,
+      start: 'top 65%',
+      end: 'bottom 55%',
+      scrub: 0.8,
+      onUpdate: (self) => {
+        const progress = self.progress;
+        const stepIndex = Math.min(6, Math.floor(progress * 7));
+        setActiveStep(stepIndex);
+
+        [desktopPath, mobilePath].forEach((path) => {
+          if (path) {
+            const length = path.getTotalLength();
+            path.style.strokeDashoffset = `${length * (1 - progress)}`;
+          }
+        });
+      },
+    });
+
+    return () => {
+      trigger.kill();
+    };
   }, []);
 
   return (
     <section id="finance" ref={container} className="light-panel relative px-6 py-24 md:px-[8.5vw] md:py-32">
-      <div className="grid gap-12 md:grid-cols-[.75fr_1.25fr]">
+      <div className="grid gap-12 md:grid-cols-[.38fr_1.62fr]">
         <div>
           <ChapterLabel number="05" label="Financial control" light />
           <RevealHeading className="chapter-title display mt-7 text-[#18181b]">Changes,<br />kept in <em>control.</em></RevealHeading>
           <p className="mt-6 max-w-[360px] text-sm leading-7 text-[#374151]">Control change requests through client approval and re-baselining, then connect progress claims, payment certificates with retention, billing, QuickBooks sync and project / company P&L through close-out.</p>
 
-          <div className="mt-8 rounded-lg border border-[#2a55a8]/20 bg-white/80 p-4 shadow-sm">
+          <div className="mt-8 rounded-lg border border-[#2a55a8]/20 bg-white/90 p-5 shadow-sm">
             <div className="flex items-center gap-2 text-[10px] font-mono text-[#2a55a8] uppercase font-semibold">
               <span className="h-2 w-2 rounded-full bg-[#3b82f6]" />
               0{activeStep + 1} — {financeSteps[activeStep].name}
@@ -455,28 +490,127 @@ export function FinanceSection() {
             <span className="eyebrow text-[#2a55a8]">Commercial workflow / connected</span>
           </div>
         </div>
-        <div className="relative min-h-[450px]">
-          <svg ref={svg} className="absolute inset-0 h-full w-full" viewBox="0 0 680 440" preserveAspectRatio="none" aria-hidden="true">
-            <path className="finance-path" d="M58 71 C155 71 150 159 247 159 S340 246 437 246 S532 334 625 334" fill="none" stroke="#3b82f6" strokeWidth="2" />
-            {[['58','71'],['153','111'],['247','159'],['342','202'],['437','246'],['531','289'],['625','334']].map(([x,y],i) => (
-              <g key={i} className="finance-node cursor-pointer" onClick={() => setActiveStep(i)}>
-                <circle cx={x} cy={y} r="14" fill={activeStep === i ? '#3b82f6' : '#f3f5fa'} stroke="#3b82f6" strokeWidth="2" />
-                <circle cx={x} cy={y} r="5" fill={activeStep === i ? '#ffffff' : '#3b82f6'} />
-              </g>
-            ))}
-          </svg>
-          <div className="relative grid h-full grid-cols-2 grid-rows-4 gap-4 py-2 md:grid-cols-4 md:grid-rows-2">
-            {financeSteps.map((step, index) => (
-              <button
-                key={step.name}
-                type="button"
-                onClick={() => setActiveStep(index)}
-                className={`flex flex-col justify-between text-left cursor-pointer p-2 rounded transition-all ${index % 2 ? 'md:mt-24' : ''} ${index === 6 ? 'col-start-2 md:col-start-4' : ''} ${activeStep === index ? 'bg-white shadow-md border border-[#3b82f6]/30' : 'hover:bg-white/40'}`}
-              >
-                <span className={`mono text-[8px] ${activeStep === index ? 'text-[#3b82f6] font-bold' : 'text-[#2a55a8]'}`}>0{index + 1} / FLOW</span>
-                <span className={`mt-8 max-w-[120px] text-[11px] font-semibold leading-5 ${activeStep === index ? 'text-[#3b82f6]' : 'text-[#18181b]'}`}>{step.name}</span>
-              </button>
-            ))}
+
+        <div>
+          {/* Desktop horizontal layout (viewBox 0 0 1200 240) */}
+          <div className="relative hidden w-full aspect-[1200/240] md:block select-none">
+            <svg ref={desktopSvg} className="absolute inset-0 h-full w-full pointer-events-none" viewBox="0 0 1200 240" aria-hidden="true">
+              <path d={desktopPathD} fill="none" stroke="#e2e8f0" strokeWidth="3" />
+              <path className="finance-path" d={desktopPathD} fill="none" stroke="#3b82f6" strokeWidth="3" />
+            </svg>
+
+            {desktopNodes.map((node, i) => {
+              const isActive = activeStep === i;
+              const isPassed = activeStep >= i;
+              const isEven = i % 2 === 0;
+
+              return (
+                <div
+                  key={financeSteps[i].name}
+                  className="absolute"
+                  style={{
+                    left: `${(node.x / 1200) * 100}%`,
+                    top: `${(node.y / 240) * 100}%`,
+                    transform: 'translate(-50%, -50%)',
+                  }}
+                >
+                  <button
+                    type="button"
+                    onClick={() => setActiveStep(i)}
+                    onFocus={() => setActiveStep(i)}
+                    className="group relative flex items-center justify-center cursor-pointer focus:outline-none"
+                    aria-label={`Step 0${i + 1}: ${financeSteps[i].name}`}
+                  >
+                    <span
+                      className={`block rounded-full transition-all duration-300 ${
+                        isActive
+                          ? 'h-8 w-8 bg-[#3b82f6] ring-4 ring-[#3b82f6]/30 scale-110 shadow-lg'
+                          : isPassed
+                          ? 'h-6 w-6 bg-[#3b82f6]'
+                          : 'h-6 w-6 bg-white border-2 border-[#3b82f6]'
+                      }`}
+                    />
+                    <span
+                      className={`absolute rounded-full transition-all duration-300 ${
+                        isActive ? 'h-3 w-3 bg-white' : 'h-2 w-2 bg-white'
+                      }`}
+                    />
+                  </button>
+
+                  <div
+                    className={`absolute left-1/2 -translate-x-1/2 whitespace-nowrap text-center transition-all duration-300 ${
+                      isEven ? 'bottom-full mb-3' : 'top-full mt-3'
+                    }`}
+                  >
+                    <span className={`block mono text-[9px] ${isActive ? 'text-[#3b82f6] font-bold' : 'text-[#2a55a8]'}`}>
+                      0{i + 1} / FLOW
+                    </span>
+                    <span className={`block text-[12px] font-semibold ${isActive ? 'text-[#3b82f6]' : 'text-[#18181b]'}`}>
+                      {financeSteps[i].name}
+                    </span>
+                  </div>
+
+                  {isActive && (
+                    <div className="absolute left-1/2 -translate-x-1/2 top-full mt-10 z-20 w-48 rounded bg-white p-2 shadow-md border border-[#3b82f6]/30 text-[10px] text-[#18181b] leading-tight">
+                      {financeSteps[i].desc}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Mobile vertical layout (viewBox 0 0 260 1000) */}
+          <div className="relative block w-full aspect-[260/1000] md:hidden select-none">
+            <svg ref={mobileSvg} className="absolute inset-0 h-full w-full pointer-events-none" viewBox="0 0 260 1000" aria-hidden="true">
+              <path d={mobilePathD} fill="none" stroke="#e2e8f0" strokeWidth="3" />
+              <path className="finance-path" d={mobilePathD} fill="none" stroke="#3b82f6" strokeWidth="3" />
+            </svg>
+
+            {mobileNodes.map((node, i) => {
+              const isActive = activeStep === i;
+              const isPassed = activeStep >= i;
+
+              return (
+                <div
+                  key={financeSteps[i].name}
+                  className="absolute"
+                  style={{
+                    left: `${(node.x / 260) * 100}%`,
+                    top: `${(node.y / 1000) * 100}%`,
+                    transform: 'translate(-50%, -50%)',
+                  }}
+                >
+                  <button
+                    type="button"
+                    onClick={() => setActiveStep(i)}
+                    onFocus={() => setActiveStep(i)}
+                    className="group relative flex items-center justify-center cursor-pointer focus:outline-none"
+                    aria-label={`Step 0${i + 1}: ${financeSteps[i].name}`}
+                  >
+                    <span
+                      className={`block rounded-full transition-all duration-300 ${
+                        isActive
+                          ? 'h-8 w-8 bg-[#3b82f6] ring-4 ring-[#3b82f6]/30 scale-110 shadow-lg'
+                          : isPassed
+                          ? 'h-6 w-6 bg-[#3b82f6]'
+                          : 'h-6 w-6 bg-white border-2 border-[#3b82f6]'
+                      }`}
+                    />
+                    <span className="absolute h-2.5 w-2.5 rounded-full bg-white" />
+                  </button>
+
+                  <div className="absolute left-1/2 -translate-x-1/2 top-full mt-2 whitespace-nowrap text-center">
+                    <span className={`block mono text-[9px] ${isActive ? 'text-[#3b82f6] font-bold' : 'text-[#2a55a8]'}`}>
+                      0{i + 1} / FLOW
+                    </span>
+                    <span className={`block text-[11px] font-semibold ${isActive ? 'text-[#3b82f6]' : 'text-[#18181b]'}`}>
+                      {financeSteps[i].name}
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>
@@ -486,54 +620,16 @@ export function FinanceSection() {
 
 export function PricingSection() {
   const [annual, setAnnual] = useState(true);
+  const viteAppUrl = import.meta.env.VITE_APP_URL;
+  const isAppUrlMissing = !viteAppUrl;
 
-  const plans = [
-    {
-      name: 'Starter',
-      target: 'Specialist contractors & small fit-out teams',
-      monthlyPrice: '$299',
-      annualPrice: '$249',
-      features: [
-        'Up to 5 Active Projects',
-        '3 Role Portals (QS, PM, Admin)',
-        'BOQ & Estimating module',
-        'Basic Gantt Scheduling',
-        'Standard Email Support',
-      ],
-      popular: false,
-    },
-    {
-      name: 'Professional',
-      target: 'Growing fit-out firms & main contractors',
-      monthlyPrice: '$699',
-      annualPrice: '$579',
-      features: [
-        'Up to 20 Active Projects',
-        'All 8 Role Portals',
-        'Full Commercial & Variation Flow',
-        'CPM Scheduling & Baseline Tracking',
-        'QuickBooks & Accounting Integration',
-        'Subcontractor RFQ & Award Packs',
-        'Priority Phone & Chat Support',
-      ],
-      popular: true,
-    },
-    {
-      name: 'Enterprise',
-      target: 'Large scale interior fit-out enterprises',
-      monthlyPrice: 'Custom',
-      annualPrice: 'Custom',
-      features: [
-        'Unlimited Active Projects',
-        'Unlimited User Accounts & Portals',
-        'Custom Approval Matrices & SLA',
-        'Dedicated ERP Onboarding Manager',
-        'Custom API & ERP Integrations',
-        '24/7 Dedicated Support',
-      ],
-      popular: false,
-    },
-  ];
+  const calculatedSavings = PLANS.reduce<number | null>((max, plan) => {
+    if (typeof plan.monthlyPrice === 'number' && typeof plan.yearlyPrice === 'number' && plan.monthlyPrice > 0) {
+      const savings = Math.round(((plan.monthlyPrice - plan.yearlyPrice) / plan.monthlyPrice) * 100);
+      return max === null ? savings : Math.max(max, savings);
+    }
+    return max;
+  }, null);
 
   return (
     <section id="pricing" className="light-panel relative border-t border-[#2a55a8]/15 px-6 py-24 md:px-[8.5vw] md:py-32">
@@ -554,51 +650,89 @@ export function PricingSection() {
             <div className={`h-4 w-4 rounded-full bg-white transition-transform ${annual ? 'translate-x-5' : 'translate-x-0'}`} />
           </button>
           <span className={`text-xs ${annual ? 'font-bold text-[#18181b]' : 'text-gray-500'}`}>
-            Annual <span className="ml-1 rounded bg-emerald-100 px-1.5 py-0.5 text-[9px] font-bold text-emerald-800">SAVE 20%</span>
+            Annual
+            {calculatedSavings !== null && (
+              <span className="ml-1 rounded bg-emerald-100 px-1.5 py-0.5 text-[9px] font-bold text-emerald-800">
+                SAVE {calculatedSavings}%
+              </span>
+            )}
           </span>
         </div>
       </div>
 
       <div className="grid gap-8 md:grid-cols-3">
-        {plans.map((plan) => (
-          <div
-            key={plan.name}
-            className={`relative flex flex-col justify-between rounded-xl border bg-white/80 p-8 backdrop-blur-sm transition-shadow hover:shadow-lg ${plan.popular ? 'border-[#3b82f6] shadow-md ring-2 ring-[#3b82f6]/20' : 'border-[#2a55a8]/15'}`}
-          >
-            {plan.popular && (
-              <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-[#3b82f6] px-3 py-1 text-[9px] font-bold uppercase tracking-wider text-white">
-                MOST POPULAR
-              </span>
-            )}
-            <div>
-              <h3 className="display text-2xl text-[#18181b]">{plan.name}</h3>
-              <p className="mt-2 min-h-[36px] text-[11px] text-[#52525b]">{plan.target}</p>
+        {PLANS.map((plan) => {
+          const price = annual ? plan.yearlyPrice : plan.monthlyPrice;
+          const currency = plan.currency || 'AED';
 
-              <div className="mt-6 border-b border-gray-100 pb-6">
-                <span className="display text-4xl font-bold text-[#18181b]">
-                  {annual ? plan.annualPrice : plan.monthlyPrice}
+          return (
+            <div
+              key={plan.id}
+              className={`relative flex flex-col justify-between rounded-xl border bg-white/80 p-8 backdrop-blur-sm transition-shadow hover:shadow-lg ${
+                plan.highlighted ? 'border-[#3b82f6] shadow-md ring-2 ring-[#3b82f6]/20' : 'border-[#2a55a8]/15'
+              }`}
+            >
+              {plan.highlighted && (
+                <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-[#3b82f6] px-3 py-1 text-[9px] font-bold uppercase tracking-wider text-white">
+                  MOST POPULAR
                 </span>
-                {plan.monthlyPrice !== 'Custom' && <span className="text-xs text-gray-500"> / month</span>}
+              )}
+              <div>
+                <h3 className="display text-2xl text-[#18181b]">{plan.name}</h3>
+                <p className="mt-2 min-h-[36px] text-[11px] text-[#52525b]">{plan.tagline}</p>
+
+                <div className="mt-6 border-b border-gray-100 pb-6">
+                  {price === null ? (
+                    <span className="display text-4xl font-bold text-[#18181b]">Contact us</span>
+                  ) : (
+                    <>
+                      <span className="display text-4xl font-bold text-[#18181b]">
+                        {currency} {price}
+                      </span>
+                      <span className="text-xs text-gray-500"> / month</span>
+                    </>
+                  )}
+                </div>
+
+                <ul className="mt-6 space-y-3">
+                  {plan.features.map((feature) => (
+                    <li key={feature} className="flex items-start gap-2.5 text-xs text-[#374151]">
+                      <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#3b82f6]" />
+                      <span>{feature}</span>
+                    </li>
+                  ))}
+                </ul>
               </div>
 
-              <ul className="mt-6 space-y-3">
-                {plan.features.map((feature) => (
-                  <li key={feature} className="flex items-start gap-2.5 text-xs text-[#374151]">
-                    <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#3b82f6]" />
-                    <span>{feature}</span>
-                  </li>
-                ))}
-              </ul>
+              {plan.cta === 'subscribe' ? (
+                <a
+                  href={isAppUrlMissing ? '#' : `${viteAppUrl}/subscribe?plan=${plan.id}&billing=${annual ? 'yearly' : 'monthly'}`}
+                  aria-disabled={isAppUrlMissing ? true : undefined}
+                  tabIndex={isAppUrlMissing ? -1 : undefined}
+                  onClick={isAppUrlMissing ? (e) => e.preventDefault() : undefined}
+                  className={`mt-8 inline-flex w-full justify-center rounded-lg py-3 text-xs font-semibold transition-colors ${
+                    plan.highlighted
+                      ? 'bg-[#3b82f6] text-white hover:bg-[#2563eb]'
+                      : 'border border-[#2a55a8]/30 text-[#2a55a8] hover:bg-[#2a55a8]/5'
+                  } ${isAppUrlMissing ? 'opacity-50 cursor-not-allowed pointer-events-none' : ''}`}
+                >
+                  Get started with {plan.name}
+                </a>
+              ) : (
+                <a
+                  href="#demo"
+                  className={`mt-8 inline-flex w-full justify-center rounded-lg py-3 text-xs font-semibold transition-colors ${
+                    plan.highlighted
+                      ? 'bg-[#3b82f6] text-white hover:bg-[#2563eb]'
+                      : 'border border-[#2a55a8]/30 text-[#2a55a8] hover:bg-[#2a55a8]/5'
+                  }`}
+                >
+                  Contact us
+                </a>
+              )}
             </div>
-
-            <a
-              href="#demo"
-              className={`mt-8 inline-flex w-full justify-center rounded-lg py-3 text-xs font-semibold transition-colors ${plan.popular ? 'bg-[#3b82f6] text-white hover:bg-[#2563eb]' : 'border border-[#2a55a8]/30 text-[#2a55a8] hover:bg-[#2a55a8]/5'}`}
-            >
-              Get started with {plan.name}
-            </a>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </section>
   );

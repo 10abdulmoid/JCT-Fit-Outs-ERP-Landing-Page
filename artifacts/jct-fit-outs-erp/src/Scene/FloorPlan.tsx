@@ -68,20 +68,43 @@ function PendantLight({ insideRef, index }: { insideRef: MutableRefObject<number
   </>;
 }
 
-function Wall({ position, size, buildRef, blueprintRef, color = '#a8c9ff' }: { position: [number, number, number]; size: [number, number, number]; buildRef: MutableRefObject<number>; blueprintRef: MutableRefObject<number>; color?: string }) {
+function Wall({
+  position,
+  size,
+  buildRef,
+  blueprintRef,
+  explodeRef,
+  color = '#a8c9ff',
+}: {
+  position: [number, number, number];
+  size: [number, number, number];
+  buildRef: MutableRefObject<number>;
+  blueprintRef: MutableRefObject<number>;
+  explodeRef?: MutableRefObject<number>;
+  color?: string;
+}) {
   const mat = useMemo(() => buildMaterial(color), [color]);
   const wallRef = useRef<THREE.Group>(null);
   useFrame(() => {
     const delay = (Math.abs(position[0]) + Math.abs(position[2])) * .018;
     const build = THREE.MathUtils.clamp((buildRef.current - delay) / (1 - delay), 0, 1);
-    if (wallRef.current) wallRef.current.scale.y = build;
+    const explode = explodeRef ? explodeRef.current : 0;
+
+    if (wallRef.current) {
+      wallRef.current.scale.y = THREE.MathUtils.lerp(build, 0.35 * build, explode);
+    }
     setBuild(mat, build);
+    if (mat) {
+      mat.transparent = true;
+      mat.opacity = THREE.MathUtils.lerp(1, 0.15, explode);
+    }
+
     const lineProgress = Math.max(blueprintRef.current, build);
     const vertexCount = edge.geometry.attributes.position.count;
     edge.geometry.setDrawRange(0, Math.floor(lineProgress * vertexCount / 2) * 2);
     const lineMaterial = edge.material as THREE.LineDashedMaterial;
     lineMaterial.gapSize = (1 - lineProgress) * .12;
-    lineMaterial.opacity = .3 + lineProgress * .58;
+    lineMaterial.opacity = THREE.MathUtils.lerp(.3 + lineProgress * .58, .15, explode);
   });
   const edge = useMemo(() => {
     const source = new THREE.BoxGeometry(...size);
@@ -141,20 +164,64 @@ export function FloorPlan({ buildRef, blueprintRef, insideRef, explodeRef }: { b
           <planeGeometry args={[12, 8]} />
         </mesh>
         <BlueprintDrawing progressRef={blueprintRef} />
-        <Wall position={[0, 1.4, -4]} size={[12, 2.8, .12]} buildRef={buildRef} blueprintRef={blueprintRef} />
-        <Wall position={[-6, 1.4, 0]} size={[.12, 2.8, 8]} buildRef={buildRef} blueprintRef={blueprintRef} />
-        <Wall position={[6, 1.4, 0]} size={[.12, 2.8, 8]} buildRef={buildRef} blueprintRef={blueprintRef} />
-        <Wall position={[0, 1.4, 4]} size={[4.5, 2.8, .12]} buildRef={buildRef} blueprintRef={blueprintRef} />
-        <Wall position={[-3.7, 1.4, 0]} size={[.12, 2.8, 8]} buildRef={buildRef} blueprintRef={blueprintRef} />
-        <Wall position={[2.5, 1.4, 0]} size={[.12, 2.8, 5.7]} buildRef={buildRef} blueprintRef={blueprintRef} />
-        <Wall position={[0, 1.4, -1.8]} size={[6, 2.8, .12]} buildRef={buildRef} blueprintRef={blueprintRef} />
+        {/* Back wall with window openings */}
+        <Wall position={[-4.25, 1.4, -4]} size={[3.5, 2.8, .12]} buildRef={buildRef} blueprintRef={blueprintRef} explodeRef={explodeRef} />
+        <mesh position={[-1.5, 1.6, -4]}><boxGeometry args={[2, 1.4, .06]} /><meshStandardMaterial color="#78aaff" transparent opacity={.35} /></mesh>
+        <Wall position={[0, 1.4, -4]} size={[1, 2.8, .12]} buildRef={buildRef} blueprintRef={blueprintRef} explodeRef={explodeRef} />
+        <mesh position={[1.5, 1.6, -4]}><boxGeometry args={[2, 1.4, .06]} /><meshStandardMaterial color="#78aaff" transparent opacity={.35} /></mesh>
+        <Wall position={[4.25, 1.4, -4]} size={[3.5, 2.8, .12]} buildRef={buildRef} blueprintRef={blueprintRef} explodeRef={explodeRef} />
+
+        {/* Side walls */}
+        <Wall position={[-6, 1.4, 0]} size={[.12, 2.8, 8]} buildRef={buildRef} blueprintRef={blueprintRef} explodeRef={explodeRef} />
+        <Wall position={[6, 1.4, 0]} size={[.12, 2.8, 8]} buildRef={buildRef} blueprintRef={blueprintRef} explodeRef={explodeRef} />
+
+        {/* Front wall open for x > 2.25 */}
+        <Wall position={[-0.875, 1.4, 4]} size={[6.25, 2.8, .12]} buildRef={buildRef} blueprintRef={blueprintRef} explodeRef={explodeRef} />
+
+        {/* Interior partitions */}
+        <Wall position={[-3.7, 1.4, 0]} size={[.12, 2.8, 8]} buildRef={buildRef} blueprintRef={blueprintRef} explodeRef={explodeRef} />
+        <Wall position={[2.5, 1.4, 0]} size={[.12, 2.8, 5.7]} buildRef={buildRef} blueprintRef={blueprintRef} explodeRef={explodeRef} />
+        <Wall position={[0, 1.4, -1.8]} size={[6, 2.8, .12]} buildRef={buildRef} blueprintRef={blueprintRef} explodeRef={explodeRef} />
+
+        {/* Ceiling beams at y = 1.55 (world y = 1.55, relative y = 2.65 above floor) */}
+        <group position={[0, 2.65, 0]}>
+          {[-4, -2, 0, 2, 4].map((x) => (
+            <mesh key={x} position={[x, 0, 0]}>
+              <boxGeometry args={[.12, .18, 8]} />
+              <meshStandardMaterial color="#5a4d3f" roughness={.8} />
+            </mesh>
+          ))}
+        </group>
+
+        {/* Rug on floor */}
+        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, .008, 0]}>
+          <planeGeometry args={[4.2, 3]} />
+          <meshStandardMaterial color="#2c4250" roughness={.9} />
+        </mesh>
+
+        {/* Shelving against wall */}
+        <group position={[-5.8, .9, 0]}>
+          <mesh><boxGeometry args={[.25, 1.8, 2.2]} /><meshStandardMaterial color="#6e5d4f" roughness={.7} /></mesh>
+        </group>
+
         <group ref={furnitureRef} position={[0, 0, 0]}>
           <instancedMesh ref={chairRef} args={[undefined, undefined, 4]} castShadow>
             <boxGeometry args={[.38, .46, .38]} />
             <meshStandardMaterial color="#536d82" roughness={.8} />
           </instancedMesh>
+
+          {/* Desk cluster 1 */}
           <mesh position={[-4.65, .48, -2.3]}><boxGeometry args={[1.6, .55, .8]} /><meshStandardMaterial color="#836750" roughness={.8} /></mesh>
           <mesh position={[-4.65, .82, -2.3]}><boxGeometry args={[1.6, .12, .8]} /><meshStandardMaterial color="#c1c5bd" /></mesh>
+
+          {/* Desk cluster 2 (additional) */}
+          <mesh position={[0, .48, -2.6]}><boxGeometry args={[1.6, .55, .8]} /><meshStandardMaterial color="#836750" roughness={.8} /></mesh>
+          <mesh position={[0, .82, -2.6]}><boxGeometry args={[1.6, .12, .8]} /><meshStandardMaterial color="#c1c5bd" /></mesh>
+
+          {/* Desk cluster 3 (additional) */}
+          <mesh position={[4.2, .48, -2.3]}><boxGeometry args={[1.6, .55, .8]} /><meshStandardMaterial color="#836750" roughness={.8} /></mesh>
+          <mesh position={[4.2, .82, -2.3]}><boxGeometry args={[1.6, .12, .8]} /><meshStandardMaterial color="#c1c5bd" /></mesh>
+
           <mesh position={[4.6, .42, 2.6]}><boxGeometry args={[1.2, .5, 1.25]} /><meshStandardMaterial color="#a17c60" roughness={.72} /></mesh>
           <mesh position={[1.2, .52, -2.8]}><boxGeometry args={[1.8, .08, .85]} /><meshStandardMaterial color="#c6bba9" /></mesh>
           {pendantPositions.map(([x, z], i) => (

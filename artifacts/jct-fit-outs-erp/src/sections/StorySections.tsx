@@ -127,21 +127,13 @@ export function InsideChapter() {
             <span className="h-px w-10 bg-white/30" />
             <div><span className="eyebrow text-white/80">Project sequence</span><p className="mt-1 text-[15px]">{process[active]}</p></div>
           </div>
-        </div>
-        <div className="relative mx-auto flex aspect-square w-full max-w-[530px] items-center justify-center">
-          <div className="absolute inset-[7%] rounded-full border border-white/10" />
-          <div className="absolute inset-[18%] rounded-full border border-dashed border-white/15" />
-          <div className="absolute h-[1px] w-full bg-white/10" /><div className="absolute h-full w-[1px] bg-white/10" />
-          <div className="relative flex h-[66%] w-[77%] rotate-[-9deg] items-center justify-center border border-[#85b5fa]/80 bg-[#24363b]/75 shadow-[0_0_60px_rgba(59,130,246,.16)]">
-            <div className="absolute inset-[9%] border border-white/20" />
-            <div className="absolute left-[50%] top-[9%] h-[55%] w-px bg-white/50" />
-            <div className="absolute left-[9%] top-[64%] h-px w-[82%] bg-white/50" />
-            <div className="absolute left-[31%] top-[9%] h-[55%] w-px bg-white/35" />
-            <div className="absolute bottom-[11%] right-[10%] h-[25%] w-[26%] bg-[#71816f]/50" />
-            <div className="absolute left-[14%] top-[19%] h-[13%] w-[27%] bg-[#a98b70]/50" />
-            {process.map((step, index) => <div key={step} className={`absolute flex items-center gap-2 transition-all duration-500 ${index === active ? 'scale-105 text-white' : 'text-white/45'}`} style={{ left: `${9 + (index % 3) * 28}%`, top: `${14 + Math.floor(index / 3) * 48}%` }}><span className={`h-2 w-2 rounded-full ${index === active ? 'bg-[#60a5fa] shadow-[0_0_14px_#60a5fa]' : 'bg-white/35'}`} /><span className="mono text-[7px] uppercase">{step}</span></div>)}
+          <div className="mt-8 flex flex-wrap gap-2">
+            {process.map((step, index) => (
+              <span key={step} className={`mono px-2.5 py-1 text-[9px] uppercase transition-colors ${index === active ? 'border border-[#60a5fa] bg-[#60a5fa]/20 text-white' : 'border border-white/10 text-white/50'}`}>
+                0{index + 1} {step}
+              </span>
+            ))}
           </div>
-          <span className="mono absolute bottom-1 right-0 text-[8px] text-white/60">LIVE PROJECT / SEQUENCE 0{active + 1}</span>
         </div>
       </div>
     </section>

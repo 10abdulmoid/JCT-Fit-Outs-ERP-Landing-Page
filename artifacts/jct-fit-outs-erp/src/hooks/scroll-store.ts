@@ -117,12 +117,12 @@ function updateSceneMetrics() {
 
   const canvasEl = document.querySelector('.scene-canvas') as HTMLElement | null;
   if (canvasEl) {
-    canvasEl.style.opacity = String(canvasOpacity);
+    canvasEl.style.setProperty('opacity', String(canvasOpacity), 'important');
   }
 
   const washEl = document.querySelector('.scene-wash') as HTMLElement | null;
   if (washEl) {
-    washEl.style.opacity = String(canvasOpacity);
+    washEl.style.setProperty('opacity', String(canvasOpacity), 'important');
   }
 
   // Derive active chapter from real DOM element viewport positions

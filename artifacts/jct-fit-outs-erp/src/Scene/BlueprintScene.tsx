@@ -78,13 +78,22 @@ function ExplodedLayers({ progressRef }: { progressRef: MutableRefObject<number>
 function SceneWorld() {
   const { camera, pointer } = useThree();
   const camCurve = useMemo(() => new THREE.CatmullRomCurve3([
-    new THREE.Vector3(0, 16.5, 2.2), new THREE.Vector3(8.2, 8.4, 10.8), new THREE.Vector3(4.1, 5.6, 8.8),
-    new THREE.Vector3(0, 3.3, 4.5), new THREE.Vector3(6, 8.2, 12), new THREE.Vector3(0, 11, 13),
+    new THREE.Vector3(0, 16.5, 2.2),
+    new THREE.Vector3(8.2, 8.4, 10.8),
+    new THREE.Vector3(0, 0.1, 3.8),
+    new THREE.Vector3(0, 3.3, 4.5),
+    new THREE.Vector3(6, 8.2, 12),
+    new THREE.Vector3(0, 11, 13),
     new THREE.Vector3(0, 8, 15),
   ]), []);
   const lookCurve = useMemo(() => new THREE.CatmullRomCurve3([
-    new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 0, 0), new THREE.Vector3(1.4, -.3, 0),
-    new THREE.Vector3(0, -.25, -1), new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 0, 0),
+    new THREE.Vector3(0, 0, 0),
+    new THREE.Vector3(0, 0, 0),
+    new THREE.Vector3(0, 0.1, -1.5),
+    new THREE.Vector3(0, -.25, -1),
+    new THREE.Vector3(0, 0, 0),
+    new THREE.Vector3(0, 0, 0),
+    new THREE.Vector3(0, 0, 0),
   ]), []);
   const smooth = useRef(0);
   const target = useRef(new THREE.Vector3());
